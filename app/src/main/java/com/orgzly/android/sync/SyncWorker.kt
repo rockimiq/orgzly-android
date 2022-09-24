@@ -218,7 +218,11 @@ class SyncWorker(val context: Context, val params: WorkerParameters) :
                 dataRepository.setBookLastActionAndSyncStatus(
                     namesake.book.book.id,
                     BookAction.forNow(BookAction.Type.INFO, context.getString(R.string.canceled)))
-
+            } else if (AppPreferences.syncDeletion(context) &&
+                namesake.status == BookSyncStatus.ONLY_BOOK_WITH_LINK &&
+                namesake.rooks.isEmpty()) {
+                /* Delete book if file backing it does not exist */
+                dataRepository.deleteBook(namesake.book, false);
             } else {
                 sendProgress(SyncState.getInstance(
                     SyncState.Type.BOOK_STARTED, namesake.name, curr, namesakes.size))
